@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>K9 PRO VIP Mini</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:system-ui;
+  color:#e5e7eb;
+}
+.center{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.card{
+  background:#020617;
+  padding:20px;
+  border-radius:14px;
+  width:90%;
+  max-width:420px;
+  box-shadow:0 0 30px #000;
+}
+h1{
+  text-align:center;
+  color:#38bdf8;
+}
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+}
+button{
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#38bdf8;
+  font-weight:700;
+}
+#chat{
+  height:55vh;
+  overflow-y:auto;
+  margin-top:10px;
+}
+.msg{
+  margin:8px 0;
+  padding:10px;
+  border-radius:10px;
+  max-width:85%;
+}
+.user{background:#1e293b;margin-left:auto}
+.bot{background:#020617;border:1px solid #334155}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="center">
+  <div class="card">
+    <h1>🔒 K9 PRO VIP</h1>
+    <input id="pass" type="password" placeholder="Nhập mật khẩu">
+    <button onclick="login()">Đăng nhập</button>
+    <p id="err" style="color:#f87171;text-align:center"></p>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="app" class="hidden">
+  <div class="card">
+    <h1>🤖 K9 PRO VIP – Mini AI</h1>
+    <div id="chat"></div>
+    <input id="input" placeholder="Nhập câu hỏi..." onkeydown="if(event.key==='Enter')send()">
+    <button onclick="send()">Gửi</button>
+  </div>
+</div>
+
+<script>
+const PASSWORD = "k9vip"; // 👈 mật khẩu ở đây
+
+function login(){
+  if(pass.value === PASSWORD){
+    login.style.display="none";
+    app.classList.remove("hidden");
+  }else{
+    err.innerText="Sai mật khẩu!";
+  }
+}
+
+function add(text,cls){
+  let d=document.createElement("div");
+  d.className="msg "+cls;
+  d.innerText=text;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function send(){
+  let v=input.value.trim();
+  if(!v) return;
+  add(v,"user");
+  input.value="";
+async function send(){
+  let v=input.value.trim();
+  if(!v) return;
+  add(v,"user");
+  input.value="";
+
+  add("🤖 K9 PRO: Đang suy nghĩ...","bot");
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer API_KEY_CỦA_BẠN"
+    },
+    body:JSON.stringify({
+      model:"gpt-4o-mini",
+      messages:[{role:"user",content:v}]
+    })
+  });
+
+  const data = await res.json();
+  chat.lastChild.innerText = "🤖 K9 PRO: " + data.choices[0].message.content;
+}  
+}
+</script>
+
+</body>
+</html>
