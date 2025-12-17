@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>K9 PRO VIP – ALL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+  --bg:#020617;
+  --panel:#0f172a;
+  --bot:#020617;
+  --user:#1e293b;
+  --accent:#38bdf8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#020617,#000);
+  font-family:system-ui;
+  color:#e5e7eb;
+}
+header{
+  padding:12px;
+  text-align:center;
+  font-weight:800;
+  color:var(--accent);
+  background:#020617;
+  box-shadow:0 0 20px #38bdf844;
+}
+#login,#app{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+#login{
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+#login input{
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  width:220px;
+}
+#login button{
+  padding:10px 18px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,#38bdf8,#22d3ee);
+  font-weight:800;
+}
+#error{color:#f87171}
+
+#chat{
+  flex:1;
+  padding:12px;
+  overflow-y:auto;
+}
+.msg{
+  max-width:85%;
+  padding:10px 12px;
+  margin:8px 0;
+  border-radius:14px;
+  line-height:1.4;
+  animation:fade .3s ease;
+}
+.user{
+  background:var(--user);
+  margin-left:auto;
+}
+.bot{
+  background:var(--bot);
+  border:1px solid #334155;
+}
+footer{
+  display:flex;
+  gap:6px;
+  padding:10px;
+  background:#020617;
+}
+footer input{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+footer button{
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  font-weight:800;
+}
+.topbar{
+  display:flex;
+  gap:6px;
+  padding:6px;
+  background:#020617;
+}
+.topbar button{
+  flex:1;
+  border:none;
+  border-radius:8px;
+  padding:8px;
+  background:#020617;
+  color:#38bdf8;
+  border:1px solid #334155;
+}
+@keyframes fade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <h2>🔐 K9 PRO VIP</h2>
+  <input id="pass" placeholder="Nhập mật khẩu">
+  <button onclick="login()">Đăng nhập</button>
+  <div id="error"></div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <header>🤖 K9 PRO VIP – ALL</header>
+
+  <div class="topbar">
+    <button onclick="changePass()">🔑 Đổi MK</button>
+    <button onclick="logout()">🚪 Đăng xuất</button>
+    <button onclick="clearChat()">🧹 Xóa chat</button>
+  </div>
+
+  <div id="chat"></div>
+
+  <footer>
+    <input id="input" placeholder="Nhập tin nhắn...">
+    <button onclick="send()">Gửi</button>
+  </footer>
+</div>
+
+<script>
+/* ====== BẢO MẬT GIẢ (DEMO) ====== */
+const DEFAULT_PASS="12345";
+
+window.onload=()=>{
+  if(localStorage.getItem("k9_login")==="yes"){
+    showApp();
+  }
+};
+
+function login(){
+  const p=pass.value;
+  const saved=localStorage.getItem("k9_pass")||DEFAULT_PASS;
+  if(p===saved){
+    localStorage.setItem("k9_login","yes");
+    showApp();
+  }else{
+    error.innerText="Sai mật khẩu!";
+  }
+}
+function showApp(){
+  loginDiv.style.display="none";
+  app.style.display="flex";
+  welcome();
+}
+function logout(){
+  localStorage.removeItem("k9_login");
+  location.reload();
+}
+function changePass(){
+  const n=prompt("Nhập mật khẩu mới:");
+  if(n && n.length>=4){
+    localStorage.setItem("k9_pass",n);
+    alert("Đã đổi mật khẩu");
+  }
+}
+
+/* ====== CHAT ====== */
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
+const loginDiv=document.getElementById("login");
+const app=document.getElementById("app");
+
+function add(text,cls){
+  const d=document.createElement("div");
+  d.className="msg "+cls;
+  d.innerText=text;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function welcome(){
+  add(`🤖 K9 PRO:
+Xin chào 👋
+Mình là K9 PRO VIP – bản ALL.
+
+Bạn có thể:
+• Trò chuyện như ChatGPT
+• Demo AI thông minh
+• Nâng cấp tiếp lên AI thật
+
+👉 Gõ gì cũng được, mình trả lời liền.`,`bot`);
+}
+
+function send(){
+  const v=input.value.trim();
+  if(!v) return;
+  add(v,"user");
+  input.value="";
+  setTimeout(()=>reply(v),500);
+}
+
+function reply(v){
+  let r="🤖 K9: ";
+  if(v.toLowerCase().includes("hello")||v.includes("xin chào"))
+    r+="Chào bạn 😄";
+  else if(v.match(/\d+\s*\+\s*\d+/))
+    r+="Kết quả là "+eval(v);
+  else if(v.includes("ai"))
+    r+="Mình là AI demo, thông minh – gọn – chạy offline.";
+  else
+    r+="Mình đã hiểu: \""+v+"\". Phiên bản AI thật sẽ trả lời sâu hơn.";
+  add(r,"bot");
+}
+
+function clearChat(){
+  chat.innerHTML="";
+  welcome();
+}
+</script>
+
+</body>
+</html>
