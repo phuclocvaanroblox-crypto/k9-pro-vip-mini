@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>ChatGPT Mini AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:system-ui;background:#0f172a;color:#e5e7eb}
+header{background:#020617;padding:12px;text-align:center;font-weight:700}
+#box{max-width:700px;margin:auto;padding:12px}
+input,button{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:none}
+button{background:#38bdf8;font-weight:700}
+#chat{height:60vh;overflow:auto}
+.msg{padding:10px;margin:6px 0;border-radius:10px}
+.user{background:#1e293b;text-align:right}
+.bot{background:#020617;border:1px solid #334155}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>🤖 ChatGPT Mini AI</header>
+<div id="box">
+
+<div id="stepName">
+  <input id="name" placeholder="Nhập tên của bạn">
+  <button onclick="saveName()">Tiếp tục</button>
+</div>
+
+<div id="stepApi" class="hidden">
+  <input id="api" placeholder="Nhập OpenAI API key">
+  <button onclick="saveApi()">Bắt đầu</button>
+</div>
+
+<div id="app" class="hidden">
+  <div id="chat"></div>
+  <input id="q" placeholder="Nhập câu hỏi...">
+  <button onclick="ask()">Gửi</button>
+</div>
+
+</div>
+
+<script>
+const owners=["phúc","thân","thượng","lộc"];
+const chat=document.getElementById("chat");
+
+function saveName(){
+  const n=name.value.trim();
+  if(!n) return;
+  localStorage.setItem("name",n);
+  stepName.classList.add("hidden");
+  stepApi.classList.remove("hidden");
+}
+
+function saveApi(){
+  const a=api.value.trim();
+  if(!a) return;
+  localStorage.setItem("api",a);
+  stepApi.classList.add("hidden");
+  app.classList.remove("hidden");
+  add("Xin chào "+localStorage.name+" 👋","bot");
+}
+
+function add(t,c){
+  let d=document.createElement("div");
+  d.className="msg "+c;
+  d.innerText=t;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+async function ask(){
+  let qv=q.value.trim();
+  if(!qv) return;
+  add(qv,"user");
+  q.value="";
+  add("⏳ Đang suy nghĩ...","bot");
+
+  const res=await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer "+localStorage.api
+    },
+    body:JSON.stringify({
+      model:"gpt-3.5-turbo",
+      messages:[{role:"user",content:qv}]
+    })
+  });
+  const data=await res.json();
+  chat.lastChild.innerText=data.choices[0].message.content;
+}
+
+(function init(){
+  if(localStorage.name && localStorage.api){
+    stepName.classList.add("hidden");
+    stepApi.classList.add("hidden");
+    app.classList.remove("hidden");
+  }
+})();
+</script>
+
+</body>
+</html>
